@@ -27,7 +27,7 @@ Node lists (and therefore documents) are represented as a JSON array.
 
 Nodes are represented as a JSON object with the following schema. All keys are required.
 
-```json
+```json5
 {
   "type": "type_of_node", // `null` if no annotation
   "name": "name_of_node",
@@ -51,7 +51,7 @@ Nodes are represented as a JSON object with the following schema. All keys are r
 
 Values are represented as a JSON object with the following schema.
 
-```json
+```json5
 // String
 //   Multi-line + raw strings are converted to single-line strings
 {
