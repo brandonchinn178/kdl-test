@@ -1,0 +1,75 @@
+name: Release
+on: workflow_dispatch
+
+defaults:
+  run:
+    shell: bash -eu -o pipefail {0}
+
+jobs:
+  cargo_metadata:
+    uses: ./.github/workflows/cargo_metadata.yml
+
+  build:
+    needs:
+      - cargo_metadata
+    uses: ./.github/workflows/build.yml
+    with:
+      platforms: |
+        [
+          "linux-x86_64",
+          "linux-arm64",
+          "darwin-x86_64",
+          "darwin-arm64"
+        ]
+      version: ${{ needs.cargo_metadata.outputs.version }}
+
+  check_changelog:
+    needs:
+      - cargo_metadata
+    runs-on: ubuntu-latest
+    env:
+      version: ${{ needs.cargo_metadata.outputs.version }}
+    steps:
+      -
+        uses: actions/checkout@v6
+      -
+        name: Validate CHANGELOG
+        run:
+          scripts/release_notes.py validate-changelog
+            --release-version "${version}"
+
+  release:
+    needs:
+      - cargo_metadata
+      - build
+    runs-on: ubuntu-latest
+    env:
+      version: ${{ needs.cargo_metadata.outputs.version }}
+    steps:
+      -
+        uses: actions/checkout@v6
+      -
+        uses: actions/download-artifact@v7
+        with:
+          path: ./.release/
+          pattern: kdl-test-*
+          merge-multiple: true
+      -
+        name: Generate release notes
+        run:
+          scripts/release_notes.py generate
+            --release-version "${version}"
+            --bin linux-x86_64 .release/kdl-test-${version}-linux-x86_64.tar.gz
+            --bin linux-aarch64 .release/kdl-test-${version}-linux-arm64.tar.gz
+            --bin macos-x86_64 .release/kdl-test-${version}-darwin-x86_64.tar.gz
+            --bin macos-aarch64 .release/kdl-test-${version}-darwin-arm64.tar.gz
+            | tee .release/release-notes.md
+      -
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.version }}
+          body_path: .release/release-notes.md
+          draft: true
+          target_commitish: ${{ github.sha }}
+          files: .release/kdl-test-*.tar.gz
+          overwrite_files: false

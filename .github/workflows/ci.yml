@@ -1,0 +1,43 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash -eu -o pipefail {0}
+
+jobs:
+  cargo_metadata:
+    uses: ./.github/workflows/cargo_metadata.yml
+
+  build:
+    needs:
+      - cargo_metadata
+    uses: ./.github/workflows/build.yml
+    with:
+      platforms: '["linux-x86_64"]'
+      version: ${{ needs.cargo_metadata.outputs.version }}
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        uses: actions/checkout@v6
+      -
+        name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      -
+        name: Install hooky
+        run: |
+          curl -fsSL \
+            https://github.com/brandonchinn178/hooky/releases/download/v1.0.0/hooky-1.0.0-linux-x86_64 \
+            -o /usr/local/bin/hooky
+          chmod +x /usr/local/bin/hooky
+      -
+        name: Run hooky
+        run: hooky run --all --format=verbose
+        env:
+          SKIP: no_commit_to_branch

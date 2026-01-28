@@ -1,0 +1,106 @@
+name: Build
+on:
+  workflow_call:
+    inputs:
+      platforms:
+        description: 'The platforms to build for'
+        required: true
+        type: string
+      version:
+        description: 'The version of kdl-test'
+        required: true
+        type: string
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: ${{ fromJSON(inputs.platforms) }}
+
+    # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+    # https://github.blog/changelog/2025-01-16-linux-arm64-hosted-runners-now-available-for-free-in-public-repositories-public-preview/
+    runs-on:
+      ${{
+        (matrix.platform == 'linux-x86_64' && 'ubuntu-24.04') ||
+        (matrix.platform == 'linux-arm64' && 'ubuntu-24.04-arm') ||
+        (matrix.platform == 'darwin-x86_64' && 'macos-15-intel') ||
+        (matrix.platform == 'darwin-arm64' && 'macos-15') ||
+        null
+      }}
+    name: ${{ matrix.platform }}
+    env:
+      version: ${{ inputs.version }}
+      platform: ${{ matrix.platform }}
+    steps:
+      -
+        name: Verify platform
+        run: |
+          set -x
+          case ${{ runner.os }} in
+            (Linux) os=linux ;;
+            (macOS) os=darwin ;;
+            (*) echo 'Unknown OS' >&1; exit 1 ;;
+          esac
+          case ${{ runner.arch }} in
+            (X64) arch=x86_64 ;;
+            (ARM64) arch=arm64 ;;
+            (*) echo 'Unknown architecture' >&1; exit 1 ;;
+          esac
+          if [[ $os-$arch != ${platform} ]]; then
+            echo "Incorrect platform: $os-$arch" >&2
+            exit 1
+          fi
+      -
+        uses: actions/checkout@v6
+      -
+        name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      -
+        name: Cache cargo registry
+        uses: actions/cache@v5
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      -
+        name: Cache cargo index
+        uses: actions/cache@v5
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
+      -
+        name: Cache target directory
+        uses: actions/cache@v5
+        with:
+          path: target
+          key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
+      -
+        name: Build
+        run: |
+          cargo build --verbose --release
+      -
+        name: Run tests
+        run: |
+          cargo build -p kdl-rs-decoder
+          flags=(--decoder target/debug/kdl-rs-decoder)
+
+          # https://github.com/kdl-org/kdl-rs/issues/146
+          flags+=(
+            --skip valid/zero_space_before_slashdash_arg.kdl
+            --skip valid/zero_space_before_slashdash_children.kdl
+            --skip valid/zero_space_before_slashdash_prop.kdl
+            --skip invalid/multiline_raw_string_single_line_err.kdl
+            --skip invalid/unicode_delete.kdl
+          )
+
+          target/release/kdl-test "${flags[@]}"
+      -
+        name: Create archive
+        run: |
+          mkdir -p .release
+          tar czvf kdl-test-${version}-${platform}.tar.gz -C target/release kdl-test
+      -
+        name: Store archive
+        uses: actions/upload-artifact@v6
+        with:
+          name: kdl-test-${{ matrix.platform }}
+          path: kdl-test-*.tar.gz
