@@ -17,7 +17,7 @@ jobs:
       -
         id: version
         run: |
-          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].version')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          VERSION=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name == "kdl-test") | .version')
+          echo "version=$VERSION" | tee -a $GITHUB_OUTPUT
     outputs:
       version: ${{ steps.version.outputs.version }}
