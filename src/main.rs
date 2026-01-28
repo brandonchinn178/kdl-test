@@ -12,8 +12,14 @@ use std::process::Output;
 #[command(name = "kdl-test")]
 #[command(about = "An implementation-agnostic test suite for KDL", long_about = None)]
 struct Args {
+    /// Path to decoder executable
     #[arg(long, value_parser = validate_executable)]
     decoder: PathBuf,
+
+    /// Test to skip (may be specified multiple times).
+    /// e.g. `--skip valid/zero_space_before_slashdash_arg.kdl`
+    #[arg(long)]
+    skip: Vec<String>,
 }
 
 fn validate_executable(s: &str) -> Result<PathBuf> {
@@ -32,8 +38,15 @@ fn main() -> Result<()> {
 
     let mut passes = 0;
     let mut failures = 0;
+    let mut skipped = 0;
     for test in all_tests {
         print!("{}", test.name());
+
+        if args.skip.contains(&test.name().to_string()) {
+            println!(" {}", "SKIP".yellow());
+            skipped += 1;
+            continue;
+        }
 
         let output = decoder.run(test.input())?;
         match test.get_result(output) {
@@ -52,8 +65,11 @@ fn main() -> Result<()> {
         print!("{}", "-".yellow());
     }
     println!();
-    println!("Test passes: {}", passes);
-    println!("Test failures: {}", failures);
+    println!("Tests passed: {}", passes);
+    println!("Tests failed: {}", failures);
+    if skipped > 0 {
+        println!("Tests skipped: {}", skipped);
+    }
 
     Ok(())
 }
