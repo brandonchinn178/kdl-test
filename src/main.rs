@@ -85,7 +85,7 @@ impl RunnableTestCase for ValidTestCase {
     fn get_result(&self, output: Output) -> TestResult {
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
-            bail!("Expected success, got:\n{}", stderr.to_string());
+            bail!("Expected success, got:\n{}", stderr);
         }
 
         let stdout = String::from_utf8_lossy(&output.stdout);
@@ -109,7 +109,7 @@ impl RunnableTestCase for InvalidTestCase {
     fn get_result(&self, output: Output) -> TestResult {
         if output.status.success() {
             let stdout = String::from_utf8_lossy(&output.stdout);
-            bail!("Expected failure, got:\n{}", stdout.to_string());
+            bail!("Expected failure, got:\n{}", stdout);
         }
 
         Ok(())
