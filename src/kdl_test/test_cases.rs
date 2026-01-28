@@ -51,17 +51,11 @@ pub fn load() -> Result<(Vec<ValidTestCase>, Vec<InvalidTestCase>)> {
         let input = Tests::get(file.as_ref()).expect("File should exist").data;
         if let Some(std::path::Component::Normal(dir)) = path.components().next() {
             if dir == "valid" {
-                let expected_file = path
-                    .with_extension("json")
-                    .to_string_lossy()
-                    .into_owned();
-                let expected_file_result = Tests::get(&expected_file).with_context(|| {
-                    format!("Expected file does not exist: {}", expected_file)
-                })?;
-                let expected =
-                    serde_json::from_slice(&expected_file_result.data).with_context(|| {
-                        format!("File is invalid json: {}", expected_file)
-                    })?;
+                let expected_file = path.with_extension("json").to_string_lossy().into_owned();
+                let expected_file_result = Tests::get(&expected_file)
+                    .with_context(|| format!("Expected file does not exist: {}", expected_file))?;
+                let expected = serde_json::from_slice(&expected_file_result.data)
+                    .with_context(|| format!("File is invalid json: {}", expected_file))?;
                 valid_tests.push(ValidTestCase {
                     name: file,
                     input,
