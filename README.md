@@ -1,12 +1,14 @@
 # kdl-test
 
-This repository implements an implementation-agnostic test suite for [KDL](https://kdl.dev).
+An implementation-agnostic test suite for [KDL](https://kdl.dev) implementations.
 
-The [official test cases](https://github.com/kdl-org/kdl/tree/main/tests) are underspecified and requires implementations have a rendering implementation ([ref](https://github.com/kdl-org/kdl/issues/252)). This test suite is minimal and only verifies that you've parsed the document correctly.
+The [official test cases](https://github.com/kdl-org/kdl/tree/main/tests) are underspecified and requires implementations have a rendering implementation ([ref](https://github.com/kdl-org/kdl/issues/252)). `kdl-test` only requires that implementations can parse a KDL document, and validates values via a JSON protocol.
 
 ## Installation
 
-Download binaries on the release page.
+Download binaries on the [releases page](https://github.com/brandonchinn178/kdl-test/releases).
+
+Alternatively, use [dotslash](https://dotslash-cli.com/docs) using the config in the GitHub release notes.
 
 ## Usage
 
@@ -79,3 +81,7 @@ Values are represented as a JSON object with the following schema.
   "type": "null"
 }
 ```
+
+Example:
+* [KDL input](https://github.com/brandonchinn178/kdl-test/blob/main/test_cases/valid/all_node_fields.kdl)
+* [Expected JSON](https://github.com/brandonchinn178/kdl-test/blob/main/test_cases/valid/all_node_fields.json)
