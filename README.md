@@ -64,7 +64,7 @@ Values are represented as a JSON object with the following schema.
 // Number
 //   Ints should always include ".0"
 //   Hex/octal/binary should be decoded
-//   Keywords should be verbatim, e.g. "#-inf"
+//   Keywords should be "inf", "-inf", "nan"
 {
   "type": "number",
   "value": "123.0"
