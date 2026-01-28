@@ -71,6 +71,9 @@ fn main() -> Result<()> {
         println!("Tests skipped: {}", skipped);
     }
 
+    if failures > 0 {
+        std::process::exit(1);
+    }
     Ok(())
 }
 
