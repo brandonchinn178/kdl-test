@@ -1,0 +1,15 @@
+[
+  {
+    "type": null,
+    "name": "foo123",
+    "entries": [],
+    "children": [
+      {
+        "type": null,
+        "name": "bar",
+        "entries": [],
+        "children": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,21 @@
+[
+  {
+    "type": null,
+    "name": "parent",
+    "entries": [],
+    "children": [
+      {
+        "type": null,
+        "name": "child",
+        "entries": [],
+        "children": []
+      },
+      {
+        "type": null,
+        "name": "child",
+        "entries": [],
+        "children": []
+      }
+    ]
+  }
+]

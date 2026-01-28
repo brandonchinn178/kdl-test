@@ -1,0 +1,22 @@
+[
+  {
+    "type": null,
+    "name": "node1",
+    "entries": [],
+    "children": [
+      {
+        "type": null,
+        "name": "node2",
+        "entries": [],
+        "children": [
+          {
+            "type": null,
+            "name": "node",
+            "entries": [],
+            "children": []
+          }
+        ]
+      }
+    ]
+  }
+]

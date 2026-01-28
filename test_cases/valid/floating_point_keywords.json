@@ -1,0 +1,33 @@
+[
+  {
+    "type": null,
+    "name": "floats",
+    "entries": [
+      {
+        "name": null,
+        "type": null,
+        "value": {
+          "type": "number",
+          "value": "inf"
+        }
+      },
+      {
+        "name": null,
+        "type": null,
+        "value": {
+          "type": "number",
+          "value": "-inf"
+        }
+      },
+      {
+        "name": null,
+        "type": null,
+        "value": {
+          "type": "number",
+          "value": "nan"
+        }
+      }
+    ],
+    "children": []
+  }
+]

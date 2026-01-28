@@ -1,0 +1,17 @@
+[
+  {
+    "type": null,
+    "name": "node",
+    "entries": [
+      {
+        "name": null,
+        "type": "type",
+        "value": {
+          "type": "string",
+          "value": "arg"
+        }
+      }
+    ],
+    "children": []
+  }
+]

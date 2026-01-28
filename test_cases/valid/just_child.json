@@ -1,0 +1,15 @@
+[
+  {
+    "type": null,
+    "name": "node",
+    "entries": [],
+    "children": [
+      {
+        "type": null,
+        "name": "inner_node",
+        "entries": [],
+        "children": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,49 @@
+[
+  {
+    "type": null,
+    "name": "node",
+    "entries": [
+      {
+        "name": null,
+        "type": null,
+        "value": {
+          "type": "string",
+          "value": ""
+        }
+      },
+      {
+        "name": null,
+        "type": null,
+        "value": {
+          "type": "string",
+          "value": ""
+        }
+      },
+      {
+        "name": null,
+        "type": null,
+        "value": {
+          "type": "string",
+          "value": ""
+        }
+      },
+      {
+        "name": null,
+        "type": null,
+        "value": {
+          "type": "string",
+          "value": "\n\n    "
+        }
+      },
+      {
+        "name": null,
+        "type": null,
+        "value": {
+          "type": "string",
+          "value": "\n"
+        }
+      }
+    ],
+    "children": []
+  }
+]

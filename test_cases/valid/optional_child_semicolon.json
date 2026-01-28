@@ -1,0 +1,27 @@
+[
+  {
+    "type": null,
+    "name": "node",
+    "entries": [],
+    "children": [
+      {
+        "type": null,
+        "name": "foo",
+        "entries": [],
+        "children": []
+      },
+      {
+        "type": null,
+        "name": "bar",
+        "entries": [],
+        "children": []
+      },
+      {
+        "type": null,
+        "name": "baz",
+        "entries": [],
+        "children": []
+      }
+    ]
+  }
+]

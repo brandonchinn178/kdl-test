@@ -1,0 +1,25 @@
+[
+  {
+    "type": null,
+    "name": "node",
+    "entries": [
+      {
+        "name": "prop",
+        "type": null,
+        "value": {
+          "type": "number",
+          "value": "10.0"
+        }
+      },
+      {
+        "name": "prop",
+        "type": null,
+        "value": {
+          "type": "number",
+          "value": "11.0"
+        }
+      }
+    ],
+    "children": []
+  }
+]

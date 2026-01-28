@@ -1,0 +1,25 @@
+[
+  {
+    "type": null,
+    "name": "node",
+    "entries": [
+      {
+        "name": "prop1",
+        "type": null,
+        "value": {
+          "type": "boolean",
+          "value": "true"
+        }
+      },
+      {
+        "name": "prop2",
+        "type": null,
+        "value": {
+          "type": "boolean",
+          "value": "false"
+        }
+      }
+    ],
+    "children": []
+  }
+]
