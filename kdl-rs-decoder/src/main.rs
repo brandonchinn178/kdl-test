@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use kdl::{KdlDocument, KdlNode, KdlValue};
+use kdl::{KdlDocument, KdlEntryFormat, KdlNode, KdlValue};
 use serde_json::{Value as JsonValue, json};
 use std::io::{self, Read};
 
@@ -28,7 +28,7 @@ fn kdl_node_to_json(node: &KdlNode) -> JsonValue {
         entries.push(json!({
             "name": entry.name().map(|name| name.value()),
             "type": entry.ty().map(|id| id.value()),
-            "value": kdl_value_to_json(entry.value()),
+            "value": kdl_value_to_json(entry.value(), entry.format()),
         }));
     }
 
@@ -44,7 +44,7 @@ fn kdl_node_to_json(node: &KdlNode) -> JsonValue {
     })
 }
 
-fn kdl_value_to_json(value: &KdlValue) -> JsonValue {
+fn kdl_value_to_json(value: &KdlValue, format: Option<&KdlEntryFormat>) -> JsonValue {
     match value {
         KdlValue::String(s) => json!({
             "type": "string",
@@ -54,22 +54,58 @@ fn kdl_value_to_json(value: &KdlValue) -> JsonValue {
             "type": "number",
             "value": format!("{}.0", x),
         }),
-        KdlValue::Float(x) if x.is_infinite() => json!({
-            "type": "number",
-            "value": format!("{}inf", if *x < 0.0 { "-" } else { "" }),
-        }),
-        KdlValue::Float(x) if x.is_nan() => json!({
-            "type": "number",
-            "value": "nan",
-        }),
-        KdlValue::Float(x) => json!({
-            "type": "number",
-            "value": if x.fract() == 0.0 {
+        KdlValue::Float(x) => {
+            let value = if let Some((n, exp)) =
+                format.and_then(|fmt| fmt.value_repr.split_once(&['e', 'E']))
+            {
+                // Original value was written with scientific notation, which may be
+                // too large/small to fit in f64, so manually render it
+                let exp = exp
+                    .chars()
+                    .filter(|c| *c != '_')
+                    .collect::<String>()
+                    .parse::<i64>()
+                    .expect("Could not parse exponent");
+                let (i, f) = n.split_once('.').unwrap_or((n, ""));
+                match usize::try_from(exp) {
+                    // Positive exponent
+                    Ok(exp) => {
+                        let i = if i == "0" { "" } else { i };
+                        let f = format!("{:0<width$}", f, width = exp);
+                        if f.len() == exp {
+                            format!("{}{}.0", i, f)
+                        } else {
+                            let (f1, f2) = f.split_at(exp);
+                            format!("{}{}.{}", i, f1, f2)
+                        }
+                    }
+                    // Negative exponent
+                    _ => {
+                        let exp = -exp as usize;
+                        let i = format!("{:0>width$}", i, width = exp);
+                        let f = if f == "0" { "" } else { f };
+                        if i.len() == exp {
+                            format!("0.{}{}", i, f)
+                        } else {
+                            let (i1, i2) = i.split_at(exp);
+                            format!("{}.{}{}", i1, i2, f)
+                        }
+                    }
+                }
+            } else if x.is_infinite() {
+                format!("{}inf", if *x < 0.0 { "-" } else { "" })
+            } else if x.is_nan() {
+                format!("nan")
+            } else if x.fract() == 0.0 {
                 format!("{}.0", x)
             } else {
                 format!("{}", x)
-            },
-        }),
+            };
+            json!({
+                "type": "number",
+                "value": value,
+            })
+        }
         KdlValue::Bool(x) => json!({
             "type": "boolean",
             "value": if *x { "true" } else { "false" },
