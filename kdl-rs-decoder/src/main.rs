@@ -64,7 +64,11 @@ fn kdl_value_to_json(value: &KdlValue) -> JsonValue {
         }),
         KdlValue::Float(x) => json!({
             "type": "number",
-            "value": format!("{}", x),
+            "value": if x.fract() == 0.0 {
+                format!("{}.0", x)
+            } else {
+                format!("{}", x)
+            },
         }),
         KdlValue::Bool(x) => json!({
             "type": "boolean",

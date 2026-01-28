@@ -16,7 +16,7 @@
         "type": null,
         "value": {
           "type": "number",
-          "value": "1"
+          "value": "1.0"
         }
       },
       {
@@ -24,7 +24,7 @@
         "type": null,
         "value": {
           "type": "number",
-          "value": "10000000000"
+          "value": "10000000000.0"
         }
       },
       {
