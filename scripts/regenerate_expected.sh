@@ -14,8 +14,10 @@ main() {
     for input in "$dir"/*.kdl; do
         local expected; expected="$dir/$(basename "$input" .kdl).json"
         echo "- $input => $expected"
-        if ! color $decoder < "$input" > "$expected"; then
-            rm "$expected"
+        if color $decoder < "$input" > "$expected.tmp"; then
+            mv "$expected.tmp" "$expected"
+        else
+            rm "$expected.tmp"
             failures+=("$input")
         fi
     done
