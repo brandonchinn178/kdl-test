@@ -55,7 +55,11 @@ fn main() -> Result<()> {
                 passes += 1;
             }
             Err(e) => {
-                println!(" {}\n{}", "FAIL".red(), e);
+                let mut input = String::from_utf8_lossy(test.input());
+                if !input.ends_with("\n") {
+                    input += "\n";
+                }
+                println!(" {}\nInput:\n{}\n{}", "FAIL".red(), input, e);
                 failures += 1;
             }
         }
