@@ -1,0 +1,35 @@
+defaults {
+    files "!/test_cases/**"
+}
+
+hook hooky {
+    command hooky lint {
+        fix_args --fix
+        pass_files file
+    }
+    files *
+}
+
+hook cargo_fmt {
+    command cargo fmt {
+        check_args -- --check
+        pass_files none
+    }
+    files *.rs
+}
+
+hook clippy {
+    command cargo clippy -- -D warnings {
+        pass_files none
+    }
+    files *.rs
+}
+
+lint_rules {
+    - check_broken_symlinks
+    - check_case_conflict
+    - check_merge_conflict
+    - end_of_file_fixer
+    - no_commit_to_branch
+    - trailing_whitespace
+}
