@@ -2,13 +2,15 @@
   {
     "type": null,
     "name": "node1",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": []
   },
   {
     "type": null,
     "name": "node2",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": []
   }
 ]

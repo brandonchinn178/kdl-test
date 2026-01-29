@@ -2,24 +2,23 @@
   {
     "type": null,
     "name": "node",
-    "entries": [
-      {
-        "name": "prop1",
+    "args": [],
+    "props": {
+      "prop1": {
         "type": null,
         "value": {
           "type": "boolean",
           "value": "true"
         }
       },
-      {
-        "name": "prop2",
+      "prop2": {
         "type": null,
         "value": {
           "type": "boolean",
           "value": "false"
         }
       }
-    ],
+    },
     "children": []
   }
 ]

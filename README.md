@@ -33,20 +33,18 @@ Nodes are represented as a JSON object with the following schema. All keys are r
 {
   "type": "type_of_node", // `null` if no annotation
   "name": "name_of_node",
-  "entries": [
-    // Argument
+  "args": [
     {
-      "name": null,
       "type": "type_of_value", // `null` if no annotation
-      "value": { /* See Value encoding */ },
-    },
-    // Property
-    {
-      "name": "name_of_prop",
-      "type": "type_of_value", // `null` if no annotation
-      "value": { /* See Value encoding */ },
+      "value": { /* See Value encoding */ }
     }
   ],
+  "props": {
+    "name_of_prop": {
+      "type": "type_of_value", // `null` if no annotation
+      "value": { /* See Value encoding */ }
+    }
+  },
   "children": [ /* nodes */ ]
 }
 ```

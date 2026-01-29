@@ -2,7 +2,8 @@
   {
     "type": null,
     "name": "null_id",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": []
   }
 ]

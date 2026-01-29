@@ -2,7 +2,8 @@
   {
     "type": null,
     "name": "true_id",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": []
   }
 ]

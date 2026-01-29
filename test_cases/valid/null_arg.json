@@ -2,15 +2,15 @@
   {
     "type": null,
     "name": "node",
-    "entries": [
+    "args": [
       {
-        "name": null,
         "type": null,
         "value": {
           "type": "null"
         }
       }
     ],
+    "props": {},
     "children": []
   }
 ]

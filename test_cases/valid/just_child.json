@@ -2,12 +2,14 @@
   {
     "type": null,
     "name": "node",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": [
       {
         "type": null,
         "name": "inner_node",
-        "entries": [],
+        "args": [],
+        "props": {},
         "children": []
       }
     ]

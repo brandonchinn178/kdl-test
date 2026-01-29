@@ -2,16 +2,16 @@
   {
     "type": null,
     "name": "node",
-    "entries": [
-      {
-        "name": "false_id",
+    "args": [],
+    "props": {
+      "false_id": {
         "type": null,
         "value": {
           "type": "number",
           "value": "1.0"
         }
       }
-    ],
+    },
     "children": []
   }
 ]

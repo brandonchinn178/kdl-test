@@ -2,29 +2,30 @@
   {
     "type": null,
     "name": "node",
-    "entries": [
+    "args": [
       {
-        "name": null,
         "type": null,
         "value": {
           "type": "string",
           "value": "arg"
         }
-      },
-      {
-        "name": "prop",
+      }
+    ],
+    "props": {
+      "prop": {
         "type": null,
         "value": {
           "type": "string",
           "value": "val"
         }
       }
-    ],
+    },
     "children": [
       {
         "type": null,
         "name": "inner_node",
-        "entries": [],
+        "args": [],
+        "props": {},
         "children": []
       }
     ]
