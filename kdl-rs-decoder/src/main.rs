@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use kdl::{KdlDocument, KdlEntryFormat, KdlNode, KdlValue};
-use serde_json::{Value as JsonValue, json};
+use serde_json::{Map, Value as JsonValue, json};
 use std::io::{self, Read};
 
 fn main() -> Result<()> {
@@ -23,13 +23,21 @@ fn kdl_node_to_json(node: &KdlNode) -> JsonValue {
     let ty = node.ty().map(|id| id.value());
     let name = node.name().value();
 
-    let mut entries = Vec::new();
-    for entry in node.entries() {
-        entries.push(json!({
-            "name": entry.name().map(|name| name.value()),
+    let mut args = Vec::new();
+    let mut props = Map::new();
+    for entry in node.iter() {
+        let value = json!({
             "type": entry.ty().map(|id| id.value()),
             "value": kdl_value_to_json(entry.value(), entry.format()),
-        }));
+        });
+        match entry.name() {
+            Some(name) => {
+                props.insert(name.value().to_string(), value);
+            }
+            None => {
+                args.push(value);
+            }
+        }
     }
 
     let children = node
@@ -39,7 +47,8 @@ fn kdl_node_to_json(node: &KdlNode) -> JsonValue {
     json!({
         "type": ty,
         "name": name,
-        "entries": entries,
+        "args": args,
+        "props": props,
         "children": children,
     })
 }
