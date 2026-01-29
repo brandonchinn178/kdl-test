@@ -20,6 +20,10 @@ struct Args {
     /// e.g. `--skip valid/zero_space_before_slashdash_arg.kdl`
     #[arg(long)]
     skip: Vec<String>,
+
+    /// Specific tests to run.
+    /// e.g. `valid/arg_bare.kdl`
+    tests: Vec<String>,
 }
 
 fn validate_executable(s: &str) -> Result<PathBuf> {
@@ -40,9 +44,15 @@ fn main() -> Result<()> {
     let mut failures = 0;
     let mut skipped = 0;
     for test in all_tests {
-        print!("{}", test.name());
+        let test_name = &test.name().to_string();
+        if !args.tests.is_empty() && !args.tests.contains(test_name) {
+            // Don't even show in output
+            continue;
+        }
 
-        if args.skip.contains(&test.name().to_string()) {
+        print!("{}", test_name);
+
+        if args.skip.contains(test_name) {
             println!(" {}", "SKIP".yellow());
             skipped += 1;
             continue;
