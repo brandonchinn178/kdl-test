@@ -2,24 +2,28 @@
   {
     "type": null,
     "name": "node",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": [
       {
         "type": null,
         "name": "foo",
-        "entries": [],
+        "args": [],
+        "props": {},
         "children": []
       },
       {
         "type": null,
         "name": "bar",
-        "entries": [],
+        "args": [],
+        "props": {},
         "children": []
       },
       {
         "type": null,
         "name": "baz",
-        "entries": [],
+        "args": [],
+        "props": {},
         "children": []
       }
     ]

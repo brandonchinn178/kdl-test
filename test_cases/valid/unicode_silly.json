@@ -2,16 +2,16 @@
   {
     "type": null,
     "name": "ノード",
-    "entries": [
-      {
-        "name": "お名前",
+    "args": [],
+    "props": {
+      "お名前": {
         "type": null,
         "value": {
           "type": "string",
           "value": "ฅ^•ﻌ•^ฅ"
         }
       }
-    ],
+    },
     "children": []
   }
 ]

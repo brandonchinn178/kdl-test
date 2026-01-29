@@ -2,9 +2,8 @@
   {
     "type": null,
     "name": "node",
-    "entries": [
+    "args": [
       {
-        "name": null,
         "type": null,
         "value": {
           "type": "string",
@@ -12,11 +11,13 @@
         }
       }
     ],
+    "props": {},
     "children": [
       {
         "type": null,
         "name": "three",
-        "entries": [],
+        "args": [],
+        "props": {},
         "children": []
       }
     ]

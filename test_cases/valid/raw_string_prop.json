@@ -2,31 +2,31 @@
   {
     "type": null,
     "name": "node_1",
-    "entries": [
-      {
-        "name": "prop",
+    "args": [],
+    "props": {
+      "prop": {
         "type": null,
         "value": {
           "type": "string",
           "value": "\"arg#\"\\n"
         }
       }
-    ],
+    },
     "children": []
   },
   {
     "type": null,
     "name": "node_2",
-    "entries": [
-      {
-        "name": "prop",
+    "args": [],
+    "props": {
+      "prop": {
         "type": null,
         "value": {
           "type": "string",
           "value": "#\"arg#\"#\\n"
         }
       }
-    ],
+    },
     "children": []
   }
 ]

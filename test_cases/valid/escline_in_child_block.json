@@ -2,18 +2,21 @@
   {
     "type": null,
     "name": "parent",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": [
       {
         "type": null,
         "name": "child",
-        "entries": [],
+        "args": [],
+        "props": {},
         "children": []
       },
       {
         "type": null,
         "name": "child",
-        "entries": [],
+        "args": [],
+        "props": {},
         "children": []
       }
     ]

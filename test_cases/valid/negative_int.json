@@ -2,24 +2,24 @@
   {
     "type": null,
     "name": "node",
-    "entries": [
+    "args": [
       {
-        "name": null,
         "type": null,
         "value": {
           "type": "number",
           "value": "-10.0"
         }
-      },
-      {
-        "name": "prop",
+      }
+    ],
+    "props": {
+      "prop": {
         "type": null,
         "value": {
           "type": "number",
           "value": "-15.0"
         }
       }
-    ],
+    },
     "children": []
   }
 ]

@@ -2,7 +2,8 @@
   {
     "type": null,
     "name": "node",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": []
   }
 ]

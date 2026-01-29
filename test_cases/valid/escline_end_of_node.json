@@ -2,13 +2,15 @@
   {
     "type": null,
     "name": "a",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": []
   },
   {
     "type": null,
     "name": "b",
-    "entries": [],
+    "args": [],
+    "props": {},
     "children": []
   }
 ]

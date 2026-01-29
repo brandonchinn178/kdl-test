@@ -2,9 +2,8 @@
   {
     "type": null,
     "name": "foo123~!@$%^&*.:'|?+<>,`-_",
-    "entries": [
+    "args": [
       {
-        "name": null,
         "type": null,
         "value": {
           "type": "string",
@@ -12,6 +11,7 @@
         }
       }
     ],
+    "props": {},
     "children": []
   }
 ]

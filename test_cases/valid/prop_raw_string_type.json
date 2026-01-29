@@ -2,16 +2,16 @@
   {
     "type": null,
     "name": "node",
-    "entries": [
-      {
-        "name": "key",
+    "args": [],
+    "props": {
+      "key": {
         "type": "type",
         "value": {
           "type": "string",
           "value": "str"
         }
       }
-    ],
+    },
     "children": []
   }
 ]
