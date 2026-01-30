@@ -1,5 +1,7 @@
 mod kdl_test;
 
+use std::fs::{self, File};
+use std::io::Write;
 use std::path::PathBuf;
 
 use anyhow::{Context, Result};
@@ -8,6 +10,7 @@ use colored::Colorize;
 
 use crate::kdl_test::decoder_exe::DecoderExe;
 use crate::kdl_test::test_cases::TestCase;
+use crate::kdl_test::test_files::TestFiles;
 
 #[derive(Parser, Debug)]
 #[command(name = "kdl-test")]
@@ -21,12 +24,16 @@ struct Args {
 enum Command {
     /// Run tests
     Run(RunArgs),
+
+    /// Extract all test files to a directory
+    Extract(ExtractArgs),
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
     match args.command {
         Command::Run(args) => run_tests(args),
+        Command::Extract(args) => extract_tests(args),
     }
 }
 
@@ -108,6 +115,28 @@ fn run_tests(args: RunArgs) -> Result<()> {
 
     if failures > 0 {
         std::process::exit(1);
+    }
+    Ok(())
+}
+
+/***** Extract tests *****/
+
+#[derive(Parser, Debug)]
+struct ExtractArgs {
+    /// Directory to extract files to
+    #[arg(long)]
+    dir: PathBuf,
+}
+
+fn extract_tests(args: ExtractArgs) -> Result<()> {
+    for (filepath, file) in TestFiles::iter_files() {
+        let dest_path = args.dir.join(filepath.as_ref());
+        if let Some(parent) = dest_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let mut dest = File::create(&dest_path)
+            .with_context(|| format!("Failed to create file: {}", dest_path.display()))?;
+        dest.write_all(&file.data)?;
     }
     Ok(())
 }
