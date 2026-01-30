@@ -1,11 +1,13 @@
 mod kdl_test;
-use colored::Colorize;
-use kdl_test::decoder_exe::DecoderExe;
-use kdl_test::test_cases::TestCase;
+
+use std::path::PathBuf;
 
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
-use std::path::PathBuf;
+use colored::Colorize;
+
+use crate::kdl_test::decoder_exe::DecoderExe;
+use crate::kdl_test::test_cases::TestCase;
 
 #[derive(Parser, Debug)]
 #[command(name = "kdl-test")]

@@ -1,12 +1,10 @@
-use anyhow::{Context, Result, anyhow, bail};
-use rust_embed::Embed;
 use std::borrow::Cow;
 use std::path::PathBuf;
 use std::process::Output;
 
-#[derive(Embed)]
-#[folder = "test_cases/"]
-struct Tests;
+use anyhow::{Context, Result, anyhow, bail};
+
+use crate::kdl_test::test_files::TestFiles;
 
 pub struct ValidTestCase {
     pub name: Cow<'static, str>,
@@ -22,27 +20,30 @@ pub struct InvalidTestCase {
 pub fn load() -> Result<(Vec<ValidTestCase>, Vec<InvalidTestCase>)> {
     let mut valid_tests = Vec::new();
     let mut invalid_tests = Vec::new();
-    for file in Tests::iter() {
-        let path = PathBuf::from(file.as_ref());
+    for (filepath, file) in TestFiles::iter_files() {
+        let path = PathBuf::from(filepath.as_ref());
         if path.extension() != Some("kdl".as_ref()) {
             continue;
         }
 
-        let input = Tests::get(file.as_ref()).expect("File should exist").data;
+        let input = file.data;
         if let Some(std::path::Component::Normal(dir)) = path.components().next() {
             if dir == "valid" {
                 let expected_file = path.with_extension("json").to_string_lossy().into_owned();
-                let expected_file_result = Tests::get(&expected_file)
+                let expected_file_result = TestFiles::get(&expected_file)
                     .with_context(|| format!("Expected file does not exist: {}", expected_file))?;
                 let expected = serde_json::from_slice(&expected_file_result.data)
                     .with_context(|| format!("File is invalid json: {}", expected_file))?;
                 valid_tests.push(ValidTestCase {
-                    name: file,
+                    name: filepath,
                     input,
                     expected,
                 })
             } else if dir == "invalid" {
-                invalid_tests.push(InvalidTestCase { name: file, input })
+                invalid_tests.push(InvalidTestCase {
+                    name: filepath,
+                    input,
+                })
             } else {
                 continue;
             }
