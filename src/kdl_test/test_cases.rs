@@ -1,7 +1,8 @@
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, anyhow, bail};
 use rust_embed::Embed;
 use std::borrow::Cow;
 use std::path::PathBuf;
+use std::process::Output;
 
 #[derive(Embed)]
 #[folder = "test_cases/"]
@@ -16,27 +17,6 @@ pub struct ValidTestCase {
 pub struct InvalidTestCase {
     pub name: Cow<'static, str>,
     pub input: Cow<'static, [u8]>,
-}
-
-pub trait TestCase {
-    fn name(&self) -> &str;
-    fn input(&self) -> &[u8];
-}
-impl TestCase for ValidTestCase {
-    fn name(&self) -> &str {
-        &self.name
-    }
-    fn input(&self) -> &[u8] {
-        &self.input
-    }
-}
-impl TestCase for InvalidTestCase {
-    fn name(&self) -> &str {
-        &self.name
-    }
-    fn input(&self) -> &[u8] {
-        &self.input
-    }
 }
 
 pub fn load() -> Result<(Vec<ValidTestCase>, Vec<InvalidTestCase>)> {
@@ -69,4 +49,77 @@ pub fn load() -> Result<(Vec<ValidTestCase>, Vec<InvalidTestCase>)> {
         }
     }
     Ok((valid_tests, invalid_tests))
+}
+
+// Ok(()) = Test pass
+// Err(e) = Test failed
+type TestResult = Result<()>;
+
+pub trait TestCase {
+    fn name(&self) -> &str;
+    fn input(&self) -> &[u8];
+    fn get_result(&self, output: Output) -> TestResult;
+}
+
+impl TestCase for ValidTestCase {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn input(&self) -> &[u8] {
+        &self.input
+    }
+
+    fn get_result(&self, output: Output) -> TestResult {
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            bail!("Expected success, got:\n{}", stderr);
+        }
+
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let actual: serde_json::Value = serde_json::from_str(&stdout)
+            .map_err(|_| anyhow!("Failed to decode output, got:\n{}", stdout))?;
+        if actual != self.expected {
+            bail!(
+                "Expected:\n\
+                 {}\n\
+                 Got:\n\
+                 {}",
+                indented(json_pretty(&self.expected)),
+                indented(json_pretty(&actual)),
+            );
+        }
+
+        Ok(())
+    }
+}
+
+impl TestCase for InvalidTestCase {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
+    fn input(&self) -> &[u8] {
+        &self.input
+    }
+
+    fn get_result(&self, output: Output) -> TestResult {
+        if output.status.success() {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            bail!("Expected failure, got:\n{}", stdout);
+        }
+
+        Ok(())
+    }
+}
+
+fn json_pretty(v: &serde_json::Value) -> String {
+    serde_json::to_string_pretty(v).expect("serde_json::Value should always serialize")
+}
+
+fn indented(s: String) -> String {
+    s.lines()
+        .map(|line| format!("    {}", line))
+        .collect::<Vec<_>>()
+        .join("\n")
 }

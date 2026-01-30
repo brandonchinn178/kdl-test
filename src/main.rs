@@ -1,12 +1,11 @@
 mod kdl_test;
 use colored::Colorize;
 use kdl_test::decoder_exe::DecoderExe;
-use kdl_test::test_cases::{InvalidTestCase, TestCase, ValidTestCase};
+use kdl_test::test_cases::TestCase;
 
-use anyhow::{Context, Result, anyhow, bail};
+use anyhow::{Context, Result};
 use clap::Parser;
 use std::path::PathBuf;
-use std::process::Output;
 
 #[derive(Parser, Debug)]
 #[command(name = "kdl-test")]
@@ -37,8 +36,8 @@ fn main() -> Result<()> {
     let (valid_tests, invalid_tests) = kdl_test::test_cases::load()?;
     let all_tests = valid_tests
         .iter()
-        .map(|t| t as &dyn RunnableTestCase)
-        .chain(invalid_tests.iter().map(|t| t as &dyn RunnableTestCase));
+        .map(|t| t as &dyn TestCase)
+        .chain(invalid_tests.iter().map(|t| t as &dyn TestCase));
 
     let mut passes = 0;
     let mut failures = 0;
@@ -89,57 +88,4 @@ fn main() -> Result<()> {
         std::process::exit(1);
     }
     Ok(())
-}
-
-// Ok(()) = Test pass
-// Err(e) = Test failed
-type TestResult = Result<()>;
-
-trait RunnableTestCase: TestCase {
-    fn get_result(&self, output: Output) -> TestResult;
-}
-impl RunnableTestCase for ValidTestCase {
-    fn get_result(&self, output: Output) -> TestResult {
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            bail!("Expected success, got:\n{}", stderr);
-        }
-
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        let actual: serde_json::Value = serde_json::from_str(&stdout)
-            .map_err(|_| anyhow!("Failed to decode output, got:\n{}", stdout))?;
-        if actual != self.expected {
-            bail!(
-                "Expected:\n\
-                 {}\n\
-                 Got:\n\
-                 {}",
-                indented(json_pretty(&self.expected)),
-                indented(json_pretty(&actual)),
-            );
-        }
-
-        Ok(())
-    }
-}
-impl RunnableTestCase for InvalidTestCase {
-    fn get_result(&self, output: Output) -> TestResult {
-        if output.status.success() {
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            bail!("Expected failure, got:\n{}", stdout);
-        }
-
-        Ok(())
-    }
-}
-
-fn json_pretty(v: &serde_json::Value) -> String {
-    serde_json::to_string_pretty(v).expect("serde_json::Value should always serialize")
-}
-
-fn indented(s: String) -> String {
-    s.lines()
-        .map(|line| format!("    {}", line))
-        .collect::<Vec<_>>()
-        .join("\n")
 }
