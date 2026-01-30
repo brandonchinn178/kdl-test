@@ -92,7 +92,7 @@ jobs:
             --skip invalid/unicode_delete.kdl
           )
 
-          target/release/kdl-test "${flags[@]}"
+          target/release/kdl-test run "${flags[@]}"
       -
         name: Create archive
         run: |

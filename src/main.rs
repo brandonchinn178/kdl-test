@@ -1,17 +1,50 @@
 mod kdl_test;
-use colored::Colorize;
-use kdl_test::decoder_exe::DecoderExe;
-use kdl_test::test_cases::{InvalidTestCase, TestCase, ValidTestCase};
 
-use anyhow::{Context, Result, anyhow, bail};
-use clap::Parser;
+use std::fs::{self, File};
+use std::io::{self, Write};
 use std::path::PathBuf;
-use std::process::Output;
+
+use anyhow::{Context, Result, anyhow};
+use clap::{Parser, Subcommand};
+use colored::Colorize;
+
+use crate::kdl_test::decoder_exe::DecoderExe;
+use crate::kdl_test::test_cases::TestCase;
+use crate::kdl_test::test_files::TestFiles;
 
 #[derive(Parser, Debug)]
 #[command(name = "kdl-test")]
 #[command(about = "An implementation-agnostic test suite for KDL", long_about = None)]
 struct Args {
+    #[command(subcommand)]
+    command: Command,
+}
+
+#[derive(Subcommand, Debug)]
+enum Command {
+    /// Run tests
+    Run(RunArgs),
+
+    /// Extract all test files to a directory
+    Extract(ExtractArgs),
+
+    /// Get the input of the given test
+    Get(GetArgs),
+}
+
+fn main() -> Result<()> {
+    let args = Args::parse();
+    match args.command {
+        Command::Run(args) => run_tests(args),
+        Command::Extract(args) => extract_tests(args),
+        Command::Get(args) => get_test_input(args),
+    }
+}
+
+/***** Run tests *****/
+
+#[derive(Parser, Debug)]
+struct RunArgs {
     /// Path to decoder executable
     #[arg(long, value_parser = validate_executable)]
     decoder: PathBuf,
@@ -30,15 +63,14 @@ fn validate_executable(s: &str) -> Result<PathBuf> {
     which::which(s).with_context(|| format!("Could not find executable '{}'", s))
 }
 
-fn main() -> Result<()> {
-    let args = Args::parse();
+fn run_tests(args: RunArgs) -> Result<()> {
     let decoder = DecoderExe::new(args.decoder);
 
     let (valid_tests, invalid_tests) = kdl_test::test_cases::load()?;
     let all_tests = valid_tests
         .iter()
-        .map(|t| t as &dyn RunnableTestCase)
-        .chain(invalid_tests.iter().map(|t| t as &dyn RunnableTestCase));
+        .map(|t| t as &dyn TestCase)
+        .chain(invalid_tests.iter().map(|t| t as &dyn TestCase));
 
     let mut passes = 0;
     let mut failures = 0;
@@ -91,55 +123,40 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// Ok(()) = Test pass
-// Err(e) = Test failed
-type TestResult = Result<()>;
+/***** Extract tests *****/
 
-trait RunnableTestCase: TestCase {
-    fn get_result(&self, output: Output) -> TestResult;
+#[derive(Parser, Debug)]
+struct ExtractArgs {
+    /// Directory to extract files to
+    #[arg(long)]
+    dir: PathBuf,
 }
-impl RunnableTestCase for ValidTestCase {
-    fn get_result(&self, output: Output) -> TestResult {
-        if !output.status.success() {
-            let stderr = String::from_utf8_lossy(&output.stderr);
-            bail!("Expected success, got:\n{}", stderr);
-        }
 
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        let actual: serde_json::Value = serde_json::from_str(&stdout)
-            .map_err(|_| anyhow!("Failed to decode output, got:\n{}", stdout))?;
-        if actual != self.expected {
-            bail!(
-                "Expected:\n\
-                 {}\n\
-                 Got:\n\
-                 {}",
-                indented(json_pretty(&self.expected)),
-                indented(json_pretty(&actual)),
-            );
+fn extract_tests(args: ExtractArgs) -> Result<()> {
+    for (filepath, file) in TestFiles::iter_files() {
+        let dest_path = args.dir.join(filepath.as_ref());
+        if let Some(parent) = dest_path.parent() {
+            fs::create_dir_all(parent)?;
         }
-
-        Ok(())
+        let mut dest = File::create(&dest_path)
+            .with_context(|| format!("Failed to create file: {}", dest_path.display()))?;
+        dest.write_all(&file.data)?;
     }
-}
-impl RunnableTestCase for InvalidTestCase {
-    fn get_result(&self, output: Output) -> TestResult {
-        if output.status.success() {
-            let stdout = String::from_utf8_lossy(&output.stdout);
-            bail!("Expected failure, got:\n{}", stdout);
-        }
-
-        Ok(())
-    }
+    Ok(())
 }
 
-fn json_pretty(v: &serde_json::Value) -> String {
-    serde_json::to_string_pretty(v).expect("serde_json::Value should always serialize")
+/***** Get test input *****/
+
+#[derive(Parser, Debug)]
+struct GetArgs {
+    /// Test to get.
+    /// e.g. valid/arg_bare.kdl
+    test: String,
 }
 
-fn indented(s: String) -> String {
-    s.lines()
-        .map(|line| format!("    {}", line))
-        .collect::<Vec<_>>()
-        .join("\n")
+fn get_test_input(args: GetArgs) -> Result<()> {
+    let file =
+        TestFiles::get(&args.test).ok_or_else(|| anyhow!("Test does not exist: {}", args.test))?;
+    io::stdout().write_all(&file.data)?;
+    Ok(())
 }
