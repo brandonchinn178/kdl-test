@@ -4,13 +4,34 @@ use kdl_test::decoder_exe::DecoderExe;
 use kdl_test::test_cases::TestCase;
 
 use anyhow::{Context, Result};
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(name = "kdl-test")]
 #[command(about = "An implementation-agnostic test suite for KDL", long_about = None)]
 struct Args {
+    #[command(subcommand)]
+    command: Command,
+}
+
+#[derive(Subcommand, Debug)]
+enum Command {
+    /// Run tests
+    Run(RunArgs),
+}
+
+fn main() -> Result<()> {
+    let args = Args::parse();
+    match args.command {
+        Command::Run(args) => run_tests(args),
+    }
+}
+
+/***** Run tests *****/
+
+#[derive(Parser, Debug)]
+struct RunArgs {
     /// Path to decoder executable
     #[arg(long, value_parser = validate_executable)]
     decoder: PathBuf,
@@ -29,8 +50,7 @@ fn validate_executable(s: &str) -> Result<PathBuf> {
     which::which(s).with_context(|| format!("Could not find executable '{}'", s))
 }
 
-fn main() -> Result<()> {
-    let args = Args::parse();
+fn run_tests(args: RunArgs) -> Result<()> {
     let decoder = DecoderExe::new(args.decoder);
 
     let (valid_tests, invalid_tests) = kdl_test::test_cases::load()?;
