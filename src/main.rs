@@ -1,10 +1,10 @@
 mod kdl_test;
 
 use std::fs::{self, File};
-use std::io::Write;
+use std::io::{self, Write};
 use std::path::PathBuf;
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, anyhow};
 use clap::{Parser, Subcommand};
 use colored::Colorize;
 
@@ -27,6 +27,9 @@ enum Command {
 
     /// Extract all test files to a directory
     Extract(ExtractArgs),
+
+    /// Get the input of the given test
+    Get(GetArgs),
 }
 
 fn main() -> Result<()> {
@@ -34,6 +37,7 @@ fn main() -> Result<()> {
     match args.command {
         Command::Run(args) => run_tests(args),
         Command::Extract(args) => extract_tests(args),
+        Command::Get(args) => get_test_input(args),
     }
 }
 
@@ -138,5 +142,21 @@ fn extract_tests(args: ExtractArgs) -> Result<()> {
             .with_context(|| format!("Failed to create file: {}", dest_path.display()))?;
         dest.write_all(&file.data)?;
     }
+    Ok(())
+}
+
+/***** Get test input *****/
+
+#[derive(Parser, Debug)]
+struct GetArgs {
+    /// Test to get.
+    /// e.g. valid/arg_bare.kdl
+    test: String,
+}
+
+fn get_test_input(args: GetArgs) -> Result<()> {
+    let file =
+        TestFiles::get(&args.test).ok_or_else(|| anyhow!("Test does not exist: {}", args.test))?;
+    io::stdout().write_all(&file.data)?;
     Ok(())
 }
