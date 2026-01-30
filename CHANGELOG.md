@@ -1,3 +1,10 @@
+# v0.2.0
+
+* Changed command to `kdl-test run ...`
+* Added more subcommands:
+    * `kdl-test extract`
+    * `kdl-test get`
+
 # v0.1.3
 
 * Fix expected output for `zero_space_before_slashdash_*` tests
