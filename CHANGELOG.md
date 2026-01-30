@@ -1,3 +1,7 @@
+# v0.1.3
+
+* Fix expected output for `zero_space_before_slashdash_*` tests
+
 # v0.1.2
 
 * Replace `entries` with separate `args` and `props` fields

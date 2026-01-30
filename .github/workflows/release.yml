@@ -42,6 +42,7 @@ jobs:
     needs:
       - cargo_metadata
       - build
+      - check_changelog
     runs-on: ubuntu-latest
     env:
       version: ${{ needs.cargo_metadata.outputs.version }}
